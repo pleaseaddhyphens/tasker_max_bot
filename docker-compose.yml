@@ -1,0 +1,50 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: tasker_max_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: tasker
+      POSTGRES_USER: tasker_user
+      POSTGRES_PASSWORD: tasker_password
+      TZ: UTC
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # # Optional: Web UI for Postgres management. Comment out if not needed.
+  # pgadmin:
+  #   image: dpage/pgadmin4:8.12
+  #   container_name: tasker_max_pgadmin
+  #   restart: unless-stopped
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
+  #   environment:
+  #     PGADMIN_DEFAULT_EMAIL: admin@example.com
+  #     PGADMIN_DEFAULT_PASSWORD: admin
+  #     PGADMIN_LISTEN_PORT: 8080
+  #   ports:
+  #     - "8080:8080"
+  #   volumes:
+  #     - pgadmin_data:/var/lib/pgadmin
+
+  # Placeholder backend service (not used yet). Once backend exists, enable build context and envs.
+  # backend:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
+  #   environment:
+  #     DATABASE_URL: postgres://tasker_user:tasker_password@db:5432/tasker
+  #   ports:
+  #     - "3000:3000"
