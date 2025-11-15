@@ -20,7 +20,7 @@ async def send_message():
         response = await client.post(
             "http://localhost:8000/send_message",
             json={
-                "user_id": 94717924,
+                "user_id": 41741568,
                 "text": "Привет!",
                 "notify": True
             }
