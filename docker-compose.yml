@@ -8,7 +8,7 @@ services:
       POSTGRES_DB: ${POSTGRES_DB:-tasker}
       POSTGRES_USER: ${POSTGRES_USER:-tasker_user}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-tasker_password}
-      TZ: ${TZ:-UTC}
+      TZ: ${TZ:-Europe/Moscow}
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./001_init.sql:/docker-entrypoint-initdb.d/001_init.sql:ro
@@ -37,6 +37,7 @@ services:
       DATABASE_URL: postgresql://${POSTGRES_USER:-tasker_user}:${POSTGRES_PASSWORD:-tasker_password}@db:5432/${POSTGRES_DB:-tasker}
       MAX_BOT_TOKEN: ${MAX_BOT_TOKEN}
       MAX_BOT_BASE_URL: ${MAX_BOT_BASE_URL:-https://botapi.max.ru}
+      TZ: ${TZ:-Europe/Moscow}
     command: ["python", "longpolling_bot.py"]
     networks:
       - tasker_network

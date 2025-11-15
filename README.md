@@ -24,7 +24,7 @@ cp env.example .env
 Откройте `.env` и укажите ваш токен MAX Bot:
 ```env
 MAX_BOT_TOKEN=ваш_токен_здесь
-MAX_BOT_BASE_URL=https://botapi.max.ru
+MAX_BOT_BASE_URL="https://platform-api.max.ru"
 ```
 
 3. **Запустите проект:**
