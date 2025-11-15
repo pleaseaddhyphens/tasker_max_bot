@@ -75,5 +75,3 @@ def get_mood_description(level: int) -> str:
     """
     return MOOD_LEVELS.get(level, "Неизвестно")
 
-
-

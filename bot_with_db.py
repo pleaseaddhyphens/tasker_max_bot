@@ -39,7 +39,7 @@ app = FastAPI(title="MAX Bot API with Database", lifespan=lifespan)
 
 # Конфигурация MAX Bot API
 ACCESS_TOKEN = "f9LHodD0cOLy---sDc0u5izFP25VAGQm2DBuG1SlbyEza4x4iCCKzzx2B2dAeDpdDawHn3hoFWKGl3CVMffI"
-BASE_URL = "https://botapi.max.ru"
+BASE_URL = "https://dev.max.ru/docs"
 
 
 # ========== Pydantic Models ==========
