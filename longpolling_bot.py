@@ -349,15 +349,15 @@ async def send_message(user_id: int, text: str) -> bool:
         return False
 
 
-async def upload_image_to_max(image_path: str) -> Optional[str]:
+async def upload_image_to_max(image_path: str) -> Optional[dict]:
     """
-    Загрузить изображение на сервер MAX и получить token
+    Загрузить изображение на сервер MAX и получить структуру photos
     
     Args:
         image_path: Путь к файлу изображения
         
     Returns:
-        Token изображения или None в случае ошибки
+        Структура photos для вложения или None в случае ошибки
     """
     try:
         # Шаг 1: Получить URL для загрузки
@@ -377,7 +377,7 @@ async def upload_image_to_max(image_path: str) -> Optional[str]:
             logger.error(f"❌ URL для загрузки не найден в ответе: {upload_data}")
             return None
         
-        logger.info(f"✅ Получен URL для загрузки: {upload_url}")
+        logger.info(f"✅ Получен URL для загрузки")
         
         # Шаг 2: Загрузить файл по полученному URL
         with open(image_path, 'rb') as f:
@@ -391,14 +391,22 @@ async def upload_image_to_max(image_path: str) -> Optional[str]:
             return None
         
         upload_result = upload_response.json()
+        
+        # API возвращает структуру: {"photos": {"photo_id": {"token": "..."}}}
+        # Возвращаем именно эту структуру для использования в attachments
+        if "photos" in upload_result:
+            photos = upload_result.get("photos", {})
+            logger.info(f"✅ Файл успешно загружен, получена структура photos")
+            return photos
+        
+        # Если структура другая, пытаемся найти token
         token = upload_result.get("token")
+        if token:
+            logger.info(f"✅ Файл успешно загружен, получен token")
+            return {"token": token}
         
-        if not token:
-            logger.error(f"❌ Token не найден в ответе: {upload_result}")
-            return None
-        
-        logger.info(f"✅ Файл успешно загружен, получен token")
-        return token
+        logger.error(f"❌ Неожиданная структура ответа: {upload_result}")
+        return None
         
     except Exception as e:
         logger.error(f"❌ Ошибка при загрузке изображения: {e}")
@@ -426,10 +434,10 @@ async def send_message_with_image(user_id: int, text: str, image_path: str) -> b
             # Отправляем хотя бы текст
             return await send_message(user_id, text)
         
-        # Загружаем изображение и получаем token
-        image_token = await upload_image_to_max(image_path)
+        # Загружаем изображение и получаем структуру photos
+        photos = await upload_image_to_max(image_path)
         
-        if not image_token:
+        if not photos:
             logger.warning(f"⚠️ Не удалось загрузить изображение, отправляем только текст")
             return await send_message(user_id, text)
         
@@ -443,7 +451,7 @@ async def send_message_with_image(user_id: int, text: str, image_path: str) -> b
                 {
                     "type": "image",
                     "payload": {
-                        "token": image_token
+                        "photos": photos
                     }
                 }
             ]
