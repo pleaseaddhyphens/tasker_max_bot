@@ -1,0 +1,3 @@
+.env
+db/data/
+db/pgadmin_data/
