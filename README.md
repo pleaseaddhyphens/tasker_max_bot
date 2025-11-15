@@ -12,7 +12,7 @@
 
 1. **Клонируйте репозиторий:**
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/pleaseaddhyphens/tasker_max_bot
 cd tasker_max_bot
 ```
 
