@@ -1,21 +1,22 @@
-# Placeholder backend image for future use
-FROM node:20-alpine AS base
+FROM python:3.11-slim
 
 WORKDIR /app
 
-# Install dependencies only when package files are present
-COPY package.json package-lock.json* pnpm-lock.yaml* yarn.lock* ./
-RUN if [ -f pnpm-lock.yaml ]; then npm i -g pnpm && pnpm i --frozen-lockfile; \
-    elif [ -f yarn.lock ]; then corepack enable && yarn install --frozen-lockfile; \
-    elif [ -f package-lock.json ]; then npm ci; \
-    else echo "No lockfile found; skipping install"; fi
+# Установка системных зависимостей
+RUN apt-get update && apt-get install -y \
+    gcc \
+    postgresql-client \
+    && rm -rf /var/lib/apt/lists/*
 
-# Copy source if present (safe for empty projects)
-COPY . .
+# Копирование requirements.txt и установка зависимостей
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-ENV NODE_ENV=production
-EXPOSE 3000
+# Копирование исходного кода
+COPY bot_with_db.py .
 
-CMD ["node", "server.js"]
+# Открываем порт
+EXPOSE 8000
 
-
+# Команда запуска
+CMD ["uvicorn", "bot_with_db:app", "--host", "0.0.0.0", "--port", "8000"]

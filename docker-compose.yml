@@ -19,7 +19,26 @@ services:
       timeout: 3s
       retries: 10
 
-  # # Optional: Web UI for Postgres management. Comment out if not needed.
+  # Backend service
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: tasker_max_backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://tasker_user:tasker_password@db:5432/tasker
+      MAX_BOT_TOKEN: ${MAX_BOT_TOKEN:-f9LHodD0cOLy---sDc0u5izFP25VAGQm2DBuG1SlbyEza4x4iCCKzzx2B2dAeDpdDawHn3hoFWKGl3CVMffI}
+      MAX_BOT_BASE_URL: ${MAX_BOT_BASE_URL:-https://botapi.max.ru}
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./bot_with_db.py:/app/bot_with_db.py:ro
+
+  # Optional: Web UI for Postgres management. Comment out if not needed.
   # pgadmin:
   #   image: dpage/pgadmin4:8.12
   #   container_name: tasker_max_pgadmin
@@ -36,15 +55,6 @@ services:
   #   volumes:
   #     - pgadmin_data:/var/lib/pgadmin
 
-  # Placeholder backend service (not used yet). Once backend exists, enable build context and envs.
-  # backend:
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile
-  #   depends_on:
-  #     db:
-  #       condition: service_healthy
-  #   environment:
-  #     DATABASE_URL: postgres://tasker_user:tasker_password@db:5432/tasker
-  #   ports:
-  #     - "3000:3000"
+volumes:
+  pgdata:
+  # pgadmin_data:  # Раскомментируйте если используете pgadmin
